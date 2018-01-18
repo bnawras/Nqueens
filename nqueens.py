@@ -4,7 +4,7 @@ from collections import Counter
 
 
 class Solver_8_queens:
-    def __init__(self, pop_size=1000, cross_prob=0.8, mut_prob=0.2):
+    def __init__(self, pop_size=1000, cross_prob=0.8, mut_prob=0.3):
         self.population_size = pop_size
 
         self.selector = RouletteSelection()
@@ -13,13 +13,14 @@ class Solver_8_queens:
         self.visualizer = СhessboardVisualizer()
 
     def solve(self, min_fitness=0.9, max_epochs=50000):
+        if max_epochs is None: max_epochs = float('inf')
+        if min_fitness is None: min_fitness = float('inf')
+
         epoch_number = 0
-        best_fitness = None
-        visualization = None
 
         population = [Individual() for i in range(self.population_size)]
 
-        while epoch_number <= max_epochs:
+        while True:
             epoch_number += 1
             population += self.crossover.cross_population(population)
             self.mutator.mutation_population(population)

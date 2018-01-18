@@ -28,7 +28,7 @@ class Solver_8_queens:
 
             best_fitness = max(individual.fitness for individual in population)
 
-            if best_fitness >= min_fitness:
+            if best_fitness >= min_fitness or epoch_number == max_epochs:
                 result = [individual for individual in population
                           if individual.fitness == best_fitness]
                 visualization = self.visualizer.get_field(result[0].chromosome)

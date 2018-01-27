@@ -4,7 +4,7 @@ from collections import Counter
 
 
 class Solver_8_queens:
-    def __init__(self, pop_size=1000, cross_prob=0.8, mut_prob=0.3):
+    def __init__(self, pop_size=1000, cross_prob=0.8, mut_prob=0.4):
         self.population_size = pop_size
 
         self.selector = RouletteSelection()
@@ -22,9 +22,9 @@ class Solver_8_queens:
 
         while True:
             epoch_number += 1
-            population += self.crossover.cross_population(population)
-            self.mutator.mutation_population(population)
-            population = self.selector.select_individuals(population,
+            descendants = self.crossover.cross_population(population)
+            self.mutator.mutation_population(descendants)
+            population = self.selector.select_individuals(population + descendants,
                                                           self.population_size)
 
             best_fitness = max(individual.fitness for individual in population)
@@ -50,23 +50,20 @@ class Individual:
     def update_fitness(self):
         self.fitness = self._calculate_fitness(self.chromosome)
 
-    @staticmethod
-    def _generate_chromosome(gene_number=8):
+    def _generate_chromosome(self, gene_number=8):
         chromosome = []
         for gene in range(0, gene_number):
             gene = random.randint(0, gene_number - 1)
             chromosome.append(gene)
         return chromosome
 
-    @staticmethod
-    def _calculate_fitness(chromosome):
-        horizontal_conflicts = Individual._horizontal_conflicts(chromosome)
-        diagonal_conflicts = Individual._diagonal_conflicts(chromosome)
+    def _calculate_fitness(self, chromosome):
+        horizontal_conflicts = self._horizontal_conflicts(chromosome)
+        diagonal_conflicts = self._diagonal_conflicts(chromosome)
         conflicts = horizontal_conflicts + diagonal_conflicts
         return (1 + conflicts) ** -1
 
-    @staticmethod
-    def _horizontal_conflicts(chromosome):
+    def _horizontal_conflicts(self, chromosome):
         conflicts = 0
 
         cnt = Counter(chromosome)
@@ -75,8 +72,7 @@ class Individual:
 
         return conflicts
 
-    @staticmethod
-    def _diagonal_conflicts(chromosome):
+    def _diagonal_conflicts(self, chromosome):
         conflicts = 0
 
         for i in range(len(chromosome)):
@@ -128,21 +124,23 @@ class Crossover:
     def __init__(self, cross_prob):
         self.cross_prob = cross_prob
 
-    def cross_population(self, population, ):
+    def cross_population(self, population):
         children = []
 
         for individual in population:
             probability = random.random()
             if probability <= self.cross_prob:
                 second_parent = self._get_parent(population)
-                children.append(self.cross_parent(individual, second_parent))
+                children += self.cross_parent(individual, second_parent)
 
         return children
 
     def cross_parent(self, first_parent, second_parent, crossing_point=3):
-        chromosome = first_parent.chromosome[:crossing_point] + \
-                     second_parent.chromosome[crossing_point:]
-        return Individual(chromosome)
+        first_chromosome = first_parent.chromosome[:crossing_point] + \
+                           second_parent.chromosome[crossing_point:]
+        second_chromosome = second_parent.chromosome[:crossing_point] + \
+                            first_parent.chromosome[crossing_point:]
+        return Individual(first_chromosome), Individual(second_chromosome)
 
     def _get_parent(self, population):
         parent = population[random.randint(0, len(population) - 1)]

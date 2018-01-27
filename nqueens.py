@@ -51,11 +51,7 @@ class Individual:
         self.fitness = self._calculate_fitness(self.chromosome)
 
     def _generate_chromosome(self, gene_number=8):
-        chromosome = []
-        for gene in range(0, gene_number):
-            gene = random.randint(0, gene_number - 1)
-            chromosome.append(gene)
-        return chromosome
+        return [random.randint(0, gene_number - 1) for i in range(0, gene_number)]
 
     def _calculate_fitness(self, chromosome):
         horizontal_conflicts = self._horizontal_conflicts(chromosome)
@@ -86,13 +82,7 @@ class Individual:
 class RouletteSelection:
     def select_individuals(self, population, count):
         roulette = self._get_roulette(population)
-        new_population = []
-
-        for i in range(0, count):
-            individual = self._select_individual(roulette)
-            new_population.append(individual)
-
-        return new_population
+        return [self._select_individual(roulette) for i in range(0, count)]
 
     def _select_individual(self, roulete):
         selected = random.random()
@@ -111,13 +101,8 @@ class RouletteSelection:
         return roulette
 
     def _get_probabilities(self, population):
-        probabilities = []
         fitness_sum = sum([individual.fitness for individual in population])
-
-        for individual in population:
-            probabilities.append((individual, individual.fitness / fitness_sum))
-
-        return probabilities
+        return [(individual, individual.fitness / fitness_sum) for individual in population]
 
 
 class Crossover:
@@ -172,4 +157,5 @@ class СhessboardVisualizer:
             prefix = filler * gene
             suffix = filler * (len(chromosome) - gene - 1)
             field.append('{0}{1}{2}'.format(prefix, queen, suffix))
+
         return '\n'.join(field)

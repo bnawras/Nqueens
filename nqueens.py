@@ -18,14 +18,14 @@ class Solver_8_queens:
 
         epoch_number = 0
 
-        population = [Individual() for i in range(self.population_size)]
+        population = [Individual() for i in range(self.population_size + 100)]
 
         while True:
             epoch_number += 1
+            population = self.selector.select_individuals(population, self.population_size)
             descendants = self.crossover.cross_population(population)
             self.mutator.mutation_population(descendants)
-            population = self.selector.select_individuals(population + descendants,
-                                                          self.population_size)
+            population += descendants
 
             best_fitness = max(individual.fitness for individual in population)
 
@@ -102,7 +102,8 @@ class RouletteSelection:
 
     def _get_probabilities(self, population):
         fitness_sum = sum([individual.fitness for individual in population])
-        return [(individual, individual.fitness / fitness_sum) for individual in population]
+        return [(individual, individual.fitness / fitness_sum)
+                for individual in population]
 
 
 class Crossover:
@@ -152,10 +153,9 @@ class Mutator:
 
 class СhessboardVisualizer:
     def get_field(self, chromosome, filler='+', queen='Q'):
-        field = []
-        for gene in chromosome:
-            prefix = filler * gene
-            suffix = filler * (len(chromosome) - gene - 1)
-            field.append('{0}{1}{2}'.format(prefix, queen, suffix))
+        field = ['{0}{1}{2}'.format(filler*gene,
+                                    queen,
+                                    filler * (len(chromosome) - gene - 1))
+                 for gene in chromosome]
 
         return '\n'.join(field)

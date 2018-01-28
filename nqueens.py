@@ -8,7 +8,7 @@ class Solver_8_queens:
         self.population_size = pop_size
 
         self.selector = RouletteSelection()
-        self.crossover = Crossover(cross_prob)
+        self.crossover = Crossover(cross_prob, 0, 1, 4, 6, 8)
         self.mutator = Mutator(mut_prob)
         self.visualizer = СhessboardVisualizer()
 
@@ -107,8 +107,9 @@ class RouletteSelection:
 
 
 class Crossover:
-    def __init__(self, cross_prob):
+    def __init__(self, cross_prob, *crossing_points):
         self.cross_prob = cross_prob
+        self.crossing_points = crossing_points
 
     def cross_population(self, population):
         children = []
@@ -121,11 +122,14 @@ class Crossover:
 
         return children
 
-    def cross_parent(self, first_parent, second_parent, crossing_point=3):
-        first_chromosome = first_parent.chromosome[:crossing_point] + \
-                           second_parent.chromosome[crossing_point:]
-        second_chromosome = second_parent.chromosome[:crossing_point] + \
-                            first_parent.chromosome[crossing_point:]
+    def cross_parent(self, first_parent, second_parent):
+        first_chromosome, second_chromosome = [], []
+
+        for i in range(1, len(self.crossing_points)):
+            first_chromosome += first_parent.chromosome[self.crossing_points[i-1]:self.crossing_points[i]]
+            second_chromosome += second_parent.chromosome[self.crossing_points[i-1]:self.crossing_points[i]]
+            first_parent, second_parent = second_parent, first_parent
+
         return Individual(first_chromosome), Individual(second_chromosome)
 
     def _get_parent(self, population):

@@ -80,30 +80,15 @@ class Individual:
 
 
 class RouletteSelection:
-    def select_individuals(self, population, count):
-        roulette = self._get_roulette(population)
-        return [self._select_individual(roulette) for i in range(0, count)]
+    def select_individuals(self, population, count, tournament_group_size=3):
+        selected_individuals = []
 
-    def _select_individual(self, roulete):
-        selected = random.random()
-        for individual in roulete:
-            if selected <= individual[1]:
-                return individual[0]
-
-    def _get_roulette(self, population):
-        probabilities = self._get_probabilities(population)
-        roulette = [probabilities[0]]
-
-        for i in range(1, len(probabilities)):
-            roulette.append((probabilities[i][0],
-                             roulette[i - 1][1] + probabilities[i][1]))
-
-        return roulette
-
-    def _get_probabilities(self, population):
-        fitness_sum = sum([individual.fitness for individual in population])
-        return [(individual, individual.fitness / fitness_sum)
-                for individual in population]
+        for i in range(0, count):
+            tournament_group = [population[random.randint(0, len(population) - 1)]
+                                for i in range(tournament_group_size)]
+            selected_individuals.append(max(tournament_group,
+                                            key=lambda individual: individual.fitness))
+        return selected_individuals
 
 
 class Crossover:

@@ -7,7 +7,7 @@ class Solver_8_queens:
     def __init__(self, pop_size=1000, cross_prob=0.8, mut_prob=0.4):
         self.population_size = pop_size
 
-        self.selector = RouletteSelection()
+        self.selector = TournamentSelection()
         self.crossover = Crossover(cross_prob, 0, 1, 4, 6, 8)
         self.mutator = Mutator(mut_prob)
         self.visualizer = СhessboardVisualizer()
@@ -79,7 +79,7 @@ class Individual:
         return conflicts
 
 
-class RouletteSelection:
+class TournamentSelection:
     def select_individuals(self, population, count, tournament_group_size=3):
         selected_individuals = []
 

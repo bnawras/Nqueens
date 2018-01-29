@@ -17,7 +17,6 @@ class Solver_8_queens:
         if min_fitness is None: min_fitness = float('inf')
 
         epoch_number = 0
-
         population = [Individual() for i in range(self.population_size + 100)]
 
         while True:
@@ -100,8 +99,7 @@ class Crossover:
         children = []
 
         for individual in population:
-            probability = random.random()
-            if probability <= self.cross_prob:
+            if random.random() <= self.cross_prob:
                 second_parent = self._get_parent(population)
                 children += self.cross_parent(individual, second_parent)
 

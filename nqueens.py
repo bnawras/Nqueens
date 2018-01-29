@@ -59,13 +59,7 @@ class Individual:
         return (1 + conflicts) ** -1
 
     def _horizontal_conflicts(self, chromosome):
-        conflicts = 0
-
-        cnt = Counter(chromosome)
-        for i in cnt.values():
-            if i != 1: conflicts += i - 1
-
-        return conflicts
+        return sum([i - 1 for i in Counter(chromosome).values() if i != 1])
 
     def _diagonal_conflicts(self, chromosome):
         conflicts = 0
